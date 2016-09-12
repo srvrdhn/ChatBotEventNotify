@@ -6,7 +6,11 @@ This is a Facebook Messenger chatbot intended for group chats that supports crea
 
 ## Usage
 
-To invoke the bot, use the prefix “EventNotify” followed by your event and participants. If no participants are specified, the all members of the group chat will be auto-added.
+To use this bot with your Messenger group, you must add the bot’s Facebook profile as a friend: <TODO: insert link here>
+Then simply add the bot to your group chat. To ensure your friends get event notifications properly, they should add the bot as a friend as well.
+
+
+To invoke the bot, use the prefix “EventNotify” followed by your event and participants. If no participants are specified, all members of the group chat will be auto-added.
 Examples:
 ```
 “EventNotify Invite @aakash @sai to hackathon Sunday 7pm at my place”

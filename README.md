@@ -1,4 +1,4 @@
-# ChatBotEventNotify
+# EventNotify
 
 ## Synopsis
 
@@ -17,10 +17,10 @@ TODO: Add more examples
 ## Installation
 
 To configure EventNotify for development, clone this repository and install the following node packages with npm install <package>
-1. bluebird
-2. request
-3. npmlog
-4. cheerio
+*bluebird
+*request
+*npmlog
+*cheerio
 
 Pull requests are welcomed!
 
@@ -39,10 +39,17 @@ TODO: Explain running tests
 
 ## Contributors
 Made at UCSD with ❤️
+
 Contributors alphabetically:
+
 Sai Annam
+
 Tejas Badadare
+
 Pramukh Govindaraju
+
 Aakash Kesavarapu
+
 Archit Mishra
+
 Chirag Toprani

@@ -1,0 +1,12 @@
+{
+  "user" : {
+      "id" : "INSERT FB ID",
+      "email" : "INSERT EMAIL",
+      "password" : "INSERT PASSWORD"
+  },
+  "userIDs" : [
+    "11111111111111",
+    "22222222222222"
+  ],
+  "pageID": "3333333333333"
+}

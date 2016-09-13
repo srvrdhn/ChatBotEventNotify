@@ -1,8 +1,8 @@
-node_modules
+origin/master
+node_modules/
 *.o
 *.swp
 *.swo
 *.DS_Store
 .DS_Store
 *.*~
-

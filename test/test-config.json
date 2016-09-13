@@ -1,8 +1,8 @@
 {
   "user" : {
       "id" : "INSERT FB ID",
-      "email" : "INSERT EMAIL",
-      "password" : "INSERT PASSWORD"
+      "email" : "EMAIL",
+      "password" : "PASS"
   },
   "userIDs" : [
     "11111111111111",

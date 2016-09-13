@@ -2,7 +2,7 @@ var login = require('../index.js');
 var fs = require('fs');
 var assert = require('assert');
 
-login({email: "redacted@gmail.com", password: "redacted"}, function callback (err, api) {
+login({email: "USERNAME", password: "PASS"}, function callback (err, api) {
     if(err) return console.error(err);
 
     api.setOptions({listenEvents: true});
@@ -19,6 +19,8 @@ login({email: "redacted@gmail.com", password: "redacted"}, function callback (er
             api.markAsRead(event.threadID, function(err) {
               if(err) console.log(err);
             });
+
+            console.log(event.body);
             var n = event.body.search("harambe");
             if(n != -1) {
               api.sendMessage("#DicksOut", event.threadID);

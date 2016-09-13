@@ -11,24 +11,23 @@ login({email: "redacted@gmail.com", password: "redacted"}, function callback (er
         if(err) return console.error(err);
 
         switch(event.type) {
-          case "message":
-            if(event.body === '/stop') {
-              api.sendMessage("Goodbye...", event.threadID);
-              return stopListening();
-            }
+            case "message":
+
+            // Always mark messages as read
             api.markAsRead(event.threadID, function(err) {
-              if(err) console.log(err);
+                if(err) console.log(err);
             });
-            var n = event.body.search("harambe");
-            if(n != -1) {
-              api.sendMessage("#DicksOut", event.threadID);
-            }
-            var n = event.body.search("suh");
-            if(n != -1) {
-              api.sendMessage("Suh dude", event.threadID);
+
+            // Run wit.ai when invoked with "EventNotify ..."
+            var invoked = event.body.startsWith("EventNotify ");
+            if(invoked) {
+                var request = event.body.substring(12); // Trim prefix
+                api.sendMessage("Request recieved: " + request, event.threadID);
+                console.log('New invocation: ' + event.body);
             }
             break;
-          case "event":
+
+            case "event":
             console.log(event);
             break;
         }

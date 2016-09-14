@@ -62,8 +62,9 @@ const client = Wit.getWit(conf.user.serverAccessToken);
 login(credentials, function callback (err, api) {
     if(err) return console.error(err);
 
-    api.setOptions({listenEvents: true});
+    if(api)    api.setOptions({listenEvents: true});
 
+    if(api) 
     api.listen(function(err, event) {
         if(err) return console.error(err);
 
@@ -88,6 +89,20 @@ login(credentials, function callback (err, api) {
             var info;
 
 
+         /*   api.getThreadInfo(event.threadID, callback(err, info)) 
+            if(err) return console.error(err);
+            var ids = info.participantIDs;
+            for(var person in ids) {
+                thisID = ids[person];
+                api.getUserInfo(thisID, function(err, ret) {
+                    if(err) return console.error(err);
+                    for(var prop in ret) {
+                        thisName = ret[prop].firstName;
+                        console.log(thisName);
+                    }
+                });
+            } */
+
             // Get message body
             var text = event.body;
 
@@ -99,6 +114,55 @@ login(credentials, function callback (err, api) {
 
             if(!event.isGroup) {
                 api.sendMessage("Hello friend this is a direct message", event.threadID);
+            }
+
+            if((text.toLowerCase()).startsWith("change") || (text.toLowerCase()).startsWith("set")) {
+                console.log('understood message');
+                var type = 3;
+                var name;
+
+                index = (text.toLowerCase()).indexOf("nickname");
+                if(index != -1) {
+                    type = 1;
+                    var index = text.indexOf("@");
+                    if(index != -1) {
+                        var end = index;
+                        while(text.charAt(end) != " ") {
+                            end++;
+                        }
+                        name = str.substring(index, end);
+                    }
+
+                }
+
+                index = (text.toLowerCase()).indexOf("emoji");
+                if(index != -1) {
+                    type = 2;
+                }
+
+                index = (text.toLowerCase()).indexOf("color");
+                if(index != -1) {
+                    type = 3;
+                }
+
+                index = text.indexOf(":");
+                var change = text.substring(index + 1, text.length - 1);
+
+                if(type == 1) {
+
+                }
+                if(type == 2) {
+                    console.log(change);
+                    api.changeThreadEmoji(change, event.threadID, function callback(err) {
+                        if(err) return console.error(err);
+                    });
+                }
+                if(type == 3) {
+                    api.changeThreadColor(change, event.threadID, function callback(err) {
+                        if(err) return console.error(err);
+                    });
+                }
+
             }
 
             if (!text) break;

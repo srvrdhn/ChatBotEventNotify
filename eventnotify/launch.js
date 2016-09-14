@@ -64,7 +64,7 @@ login(credentials, function callback (err, api) {
 
     if(api)    api.setOptions({listenEvents: true});
 
-    if(api) 
+    if(api)
     api.listen(function(err, event) {
         if(err) return console.error(err);
 
@@ -89,7 +89,7 @@ login(credentials, function callback (err, api) {
             var info;
 
 
-         /*   api.getThreadInfo(event.threadID, callback(err, info)) 
+         /*   api.getThreadInfo(event.threadID, callback(err, info))
             if(err) return console.error(err);
             var ids = info.participantIDs;
             for(var person in ids) {
@@ -112,9 +112,7 @@ login(credentials, function callback (err, api) {
             * -------------------- PARSE USER INPUT -------------------- *
             **************************************************************/
 
-            if(!event.isGroup) {
-                api.sendMessage("Direct Message Response", event.threadID);
-            }
+            if (!text) break;
 
             var ind = text.indexOf("color");
 
@@ -142,10 +140,7 @@ login(credentials, function callback (err, api) {
                 });
             }
 
-            if (!text) break;
-
             // Display current events UI upon "EventNotify"
-
             if (text && text.toLowerCase() === "eventnotify") {
                 var retval = HEADER + displayEvents() + "\n" + FOOTER;
                 api.sendMessage(retval, event.threadID);
@@ -158,17 +153,18 @@ login(credentials, function callback (err, api) {
             if(invoked) {
                 client.message(text.substring(12), sessions[sessionId].context)
                 .then((data) => {
-                    console.log('Yay, got Wit.ai response: ' + JSON.stringify(data, null, 4));
-
-                    console.log();
+                    console.log(JSON.stringify(data, null, 4));
 
                     // Get entities, which include events, times, etc.
                     var res = data.entities;
 
                     var contacts = [];  // Holds all found participants
                     var date;           // Datetime for the event
+                    var dateString;     // Formatted date
                     var eventName;      // Event name
                     var location;       // Event location
+
+                    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
                     // Retrieve event name
                     if (res.hasOwnProperty('event')) {
@@ -197,43 +193,47 @@ login(credentials, function callback (err, api) {
 
                     // Retrieve datetime
                     if (res.hasOwnProperty('datetime')) {
-                        console.log('Datetimes(s) extracted: ' + res.datetime[0].value);
-                        display += 'Datetimes(s) extracted: ' + res.datetime[0].value + "\n";
-                        date = res.datetime[0].value;
+                        var dateSplit = res.datetime[0].value.split("T");
+
+                        console.log('Date parsed: ' + dateSplit[0] + " " + dateSplit[1].substring(0, 5));
+
+                        date = new Date(Date.parse(dateSplit[0] + " " + dateSplit[1].substring(0, 5)));
+                        dateString = formatDateTime(date);
+                        display += "Time: " + dateString + "\n";
                     } else {
                         console.log('No datetimes found.');
                     }
 
                     // Retrieve participants
                     if (res.hasOwnProperty('contact')) {
-                        var contactArray = [];
-                        console.log(res.contact[1]);
+                        // Check for mutiple contacts in one value
                         for (var i = 0; i < res.contact.length; i++) {
                             if (res.contact[i].value.lastIndexOf("@") == 0) {
-                                contactArray.push(res.contact[i].value);
+                                contacts.push(res.contact[i].value);
                             }
                             else {
                                 var splitContacts = res.contact[i].value.split(" ");
                                 for (var k = 0; k < splitContacts.length; k++) {
-                                    contactArray.push(splitContacts[k]);
+                                    contacts.push(splitContacts[k]);
                                 }
                             }
                         }
-                        for (var i = 0; i < contactArray.length; i++) {
-                            var c = contactArray[i];
+
+                        // Print out contacts
+                        for (var i = 0; i < contacts.length; i++) {
+                            var c = contacts[i];
                             console.log('Contact(s) extracted: ' + c);
-                            display += 'Contact(s) extracted: ' + c + "\n";
+                            display += 'Contact invited: ' + c + "\n";
                             api.getUserID(c.substring(1), function(err, data) {
                                 if(err) return callback(err);
+
                                 // Send the message to the best match (best by Facebook's criteria)
                                 var threadID = data[0].userID;
                                 var message = senderName + " invited you to " + eventName;
 
-                                if(location)    message = message + " at " + location;  
+                                if(location)    message = message + " at " + location;
                                 if(date) {
-                                    var dateObj  = new Date(date);
-                                    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                                    message = message + " on " + monthNames[dateObj.getMonth()] + " " + dateObj.getDay() + ", " + dateObj.getFullYear();
+                                    message = message + " on " + dateString;
                                 }
 
                                 message = message.replace("my", genderPos);
@@ -248,7 +248,7 @@ login(credentials, function callback (err, api) {
 
                     console.log('returning: ' + HEADER + display + FOOTER);
 
-                    //create Timeout of 2 seconds where the API sends a typing indicator 
+                    //create Timeout of 2 seconds where the API sends a typing indicator
                     //before it prints the message
                     setTimeout(function() {
                         api.sendTypingIndicator(event.threadID, function(err) {

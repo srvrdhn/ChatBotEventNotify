@@ -2,6 +2,7 @@ var login = require('../index.js');
 var fs = require('fs');
 var assert = require('assert');
 
+
 login({email: "USERNAME", password: "PASS"}, function callback (err, api) {
     if(err) return console.error(err);
 
@@ -28,6 +29,15 @@ login({email: "USERNAME", password: "PASS"}, function callback (err, api) {
             var n = event.body.search("suh");
             if(n != -1) {
               api.sendMessage("Suh dude", event.threadID);
+
+              api.getUserID("USER NAME", function(err, data) {
+                console.log(data);
+                if(err) return callback(err);
+
+                // Send the message to the best match (best by Facebook's criteria)
+                var threadID = data[0].userID;
+                api.sendMessage("if you're reading this its too late", threadID);
+              });
             }
             break;
           case "event":

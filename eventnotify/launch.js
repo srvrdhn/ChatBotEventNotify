@@ -86,6 +86,22 @@ login(credentials, function callback (err, api) {
                     console.log();
 
                     api.sendMessage(JSON.stringify(data, null, 4), event.threadID);
+
+                  //Personal Message. Searches for sample user name and 
+                  //then sends a message to that user. The user is based on facebook's graph 
+                  //search of the user. 
+
+                  //TODO: Improve based on https://github.com/Schmavery/facebook-chat-api/blob/master/DOCS.md#getFriendsList
+                  //friends list (cross reference userIDS until matches).
+                  api.getUserID("USER NAME", function(err, data) {
+                    console.log(data);
+                    if(err) return callback(err);
+
+                    // Send the message to the best match (best by Facebook's criteria)
+                  //  var threadID = data[0].userID;
+                   // api.sendMessage("if you're reading this its too late", threadID);
+                  });
+
 /*
                     console.log('Event extracted: ' + response.entities.event, event.threadID);
                     console.log('Contact(s) extracted: ' + response.entities.contact, event.threadID);

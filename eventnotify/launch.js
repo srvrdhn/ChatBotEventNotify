@@ -11,9 +11,10 @@ const Wit = require('./witbot.js');
 const sessions = {};
 
 // Padding constants
-const HEADER = '~~~~~~~~ EventNotify ~~~~~~~\n';
-const NEW_EVENT = '        NEW EVENT CREATED!';
-const FOOTER = '~~~~~~~~~~~~~~~~~~~~~~~~~';
+const HEADER =      '~~~~~~~~ EventNotify ~~~~~~~\n';
+const NEW_EVENT =   '        NEW EVENT CREATED!';
+const CUR_EVENTS =  '          CURRENT EVENTS';
+const FOOTER =      '~~~~~~~~~~~~~~~~~~~~~~~~~';
 
 
 /**
@@ -142,14 +143,18 @@ login(credentials, function callback (err, api) {
             }
 
             // Display current events UI upon "EventNotify" or "EN"
-            if (text.toLowerCase() === "eventnotify") {
+            if (text.toLowerCase() === "eventnotify" || text === "EN") {
                 var retval = HEADER + displayEvents() + "\n" + FOOTER;
                 api.sendMessage(retval, event.threadID);
             }
 
+            if (text.toLowerCase() === "eventnotify help") {
+                api.sendMessage(HEADER + displayHelp() + "\n" + FOOTER, event.threadID);
+            }
+
             // Run wit.ai upon "EventNotify ..."
             if (text) {
-                var invoked = (text.startsWith("EventNotify ") || text.startsWith("EN"));
+                var invoked = (text.startsWith("EventNotify ") || text.startsWith("EN "));
             }
             if(invoked) {
                 var toSend;
@@ -346,5 +351,20 @@ function sendMessage(api, message, threadID){
 }
 
 function displayEvents() {
-    return "Your group's events go here";
+    var msg = CUR_EVENTS + "\n" + "No events." + "\nTry \"EventNotify help\" for more info.";
+    return msg;
+}
+
+function displayHelp() {
+    var msg = "Welcome to EventNotify!\nThis is a bot that helps you and your"
+                + "\ngroup chat create quick, imprompu events.\n\n"
+                + "To create an event, just start your sentence with 'EventNotify' and talk naturally."
+                + "\nTo invite specific people rather than the whole group chat, "
+                + "tag them with their first name using the @ symbol."
+                + "\nHere are some examples:\n\n"
+                + '"EventNotify basketball next Friday at 9 pm"\n'
+                + '"EventNotify invite @John and @Jane to brunch at my place tomorrow morning"\n'
+                + "\nTry it out!";
+    return msg;
+
 }

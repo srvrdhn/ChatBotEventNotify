@@ -1,10 +1,12 @@
 credentials.json
 node_modules/*
+/node_modules
 *.o
 *.swp
 *.swo
 *.DS_Store
 .DS_Store
 *.*~
+*.log
 
-const.js
+*.log

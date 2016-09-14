@@ -85,8 +85,10 @@ login(credentials, function callback (err, api) {
 
                     console.log();
 
-                    api.sendMessage(JSON.stringify(data, null, 4), event.threadID);
-/*
+                    var response = JSON.parse(data);
+
+//                    api.sendMessage(JSON.stringify(data, null, 4), event.threadID);
+
                     console.log('Event extracted: ' + response.entities.event, event.threadID);
                     console.log('Contact(s) extracted: ' + response.entities.contact, event.threadID);
                     console.log('Datetimes(s) extracted: ' + response.entities.datetime, event.threadID);
@@ -94,7 +96,7 @@ login(credentials, function callback (err, api) {
                     api.sendMessage('Event extracted: ' + response.entities.event, event.threadID);
                     api.sendMessage('Contact(s) extracted: ' + response.entities.contact, event.threadID);
                     api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime, event.threadID);
-*/
+
                 })
                 .catch(console.error);
             } else {

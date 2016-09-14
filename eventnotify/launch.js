@@ -80,11 +80,26 @@ login(credentials, function callback (err, api) {
                 for(var prop in ret) {
                     senderName = ret[prop].firstName;
                     if(ret[prop].gender != 2) genderPos = "her";
-                    console.log(ret[prop].gender);
                 }
             });
 
             var sessionId = findOrCreateSession(sender);
+
+            var info;
+
+         /*   api.getThreadInfo(event.threadID, callback(err, info)) 
+            if(err) return console.error(err);
+            var ids = info.participantIDs;
+            for(var person in ids) {
+                thisID = ids[person];
+                api.getUserInfo(thisID, function(err, ret) {
+                    if(err) return console.error(err);
+                    for(var prop in ret) {
+                        thisName = ret[prop].firstName;
+                        console.log(thisName);
+                    }
+                });
+            } */
 
             // Get message body
             var text = event.body;
@@ -94,6 +109,10 @@ login(credentials, function callback (err, api) {
             /**************************************************************
             * -------------------- PARSE USER INPUT -------------------- *
             **************************************************************/
+
+            if(!event.isGroup) {
+                api.sendMessage("Hello friend this is a direct message", event.threadID);
+            }
 
             if (!text) break;
 
@@ -165,9 +184,11 @@ login(credentials, function callback (err, api) {
                             display += 'Contact(s) extracted: ' + c.value + "\n";
                             api.getUserID(c.value.substring(1), function(err, data) {
                                 if(err) return callback(err);
+
                                 // Send the message to the best match (best by Facebook's criteria)
                                 var threadID = data[0].userID;
                                 var message = senderName + " invited you to " + eventName;
+
                                 if(location) message = message + " at " + location;
                                 if(date) message = message + " at " + date;
 

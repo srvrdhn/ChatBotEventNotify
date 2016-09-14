@@ -78,7 +78,7 @@ login(credentials, function callback (err, api) {
                 if(err) return console.error(err);
                 for(var prop in ret) {
                     senderName = ret[prop].firstName;
-                }            
+                }
             });
 
             var sessionId = findOrCreateSession(sender);
@@ -89,8 +89,10 @@ login(credentials, function callback (err, api) {
             var display = '';
 
             /**************************************************************
-             * -------------------- PARSE USER INPUT -------------------- *
-             **************************************************************/
+            * -------------------- PARSE USER INPUT -------------------- *
+            **************************************************************/
+
+            if (!text) break;
 
             // Display current events UI upon "EventNotify"
             if (text.toLowerCase() === "eventnotify") {
@@ -163,7 +165,7 @@ login(credentials, function callback (err, api) {
                                 var threadID = data[0].userID;
                                 api.sendMessage(senderName + " invited you to " + eventName + " at " + location, threadID);
                                 api.sendMessage("Can you make it?", threadID);
-                         });
+                            });
                         }
                     } else {
                         console.log('No contacts found.');

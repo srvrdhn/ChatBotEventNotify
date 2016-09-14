@@ -72,6 +72,15 @@ login(credentials, function callback (err, api) {
 
             // Get uesr's fbid and get their session
             var sender = event.senderID;
+            var senderName;
+
+            api.getUserInfo(sender, function(err, ret) {
+                if(err) return console.error(err);
+                for(var prop in ret) {
+                    senderName = ret[prop].firstName;
+                }            
+            });
+
             var sessionId = findOrCreateSession(sender);
 
             // Get message body
@@ -152,7 +161,8 @@ login(credentials, function callback (err, api) {
                                 if(err) return callback(err);
                                 // Send the message to the best match (best by Facebook's criteria)
                                 var threadID = data[0].userID;
-                                api.sendMessage("Come to " + eventName + " at " + date, threadID);
+                                api.sendMessage(senderName + " invited you to " + eventName + " at " + location, threadID);
+                                api.sendMessage("Can you make it?", threadID);
                          });
                         }
                     } else {

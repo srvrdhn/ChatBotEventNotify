@@ -141,18 +141,25 @@ login(credentials, function callback (err, api) {
                 });
             }
 
-            // Display current events UI upon "EventNotify"
-            if (text && text.toLowerCase() === "eventnotify") {
+            // Display current events UI upon "EventNotify" or "EN"
+            if (text.toLowerCase() === "eventnotify") {
                 var retval = HEADER + displayEvents() + "\n" + FOOTER;
                 api.sendMessage(retval, event.threadID);
             }
 
             // Run wit.ai upon "EventNotify ..."
             if (text) {
-                var invoked = text.startsWith("EventNotify ");
+                var invoked = (text.startsWith("EventNotify ") || text.startsWith("EN"));
             }
             if(invoked) {
-                client.message(text.substring(12), sessions[sessionId].context)
+                var toSend;
+                // Handle both long and short invocations
+                if (text.startsWith("EventNotify")) {
+                    toSend = text.substring(12);
+                } else {
+                    toSend = text.substring(3);
+                }
+                client.message(toSend, sessions[sessionId].context)
                 .then((data) => {
                     console.log(JSON.stringify(data, null, 4));
 
@@ -161,8 +168,11 @@ login(credentials, function callback (err, api) {
 
                     var contacts = [];  // Holds all found participants
                     var contactString = ''; // Formatted string of contacts
+                    var printContactString = true;  // Whether or not to print contact string
+
                     var date;           // Datetime for the event
                     var dateString;     // Formatted date
+
                     var eventName;      // Event name
                     var location;       // Event location
 
@@ -196,8 +206,17 @@ login(credentials, function callback (err, api) {
 
                     // Retrieve datetime
                     if (res.hasOwnProperty('datetime')) {
-                        var dateSplit = res.datetime[0].value.split("T");
-                        date = new Date(Date.parse(dateSplit[0] + " " + dateSplit[1].substring(0, 5)));
+                        var ds = res.datetime[0].value.substring(0, 19).split(/T|:|-/)
+                        console.log(ds);
+
+                        var date = new Date(ds[0], --ds[1], ds[2], ds[3], ds[4], ds[5]);
+                        /*date.setFullYear(ds[0]);
+                        date.setMonth(--ds[1]);
+                        date.setDate(ds[2]);
+                        date.setHours(ds[3]);
+                        date.setMinutes(ds[4]);*/
+                        console.log('Parsed date object: ' + date);
+                        //date = new Date(Date.parse(ds[0] + " " + dateSplit[1].substring(0, 5)));
                         dateString = formatDateTime(date);
                         display += "When: " + dateString + "\n";
                         console.log("Date string: " + dateString);
@@ -258,11 +277,16 @@ login(credentials, function callback (err, api) {
                         }
                     } else {
                         console.log('No contacts found.');
+                        if (event.isGroup) {
+                            contactString = 'Everybody in this chat.';
+                        } else {
+                            printContactString = false;
+                        }
                     }
 
-                    display += "Who: " + contactString + "\n";
+                    if (printContactString) display += "Who: " + contactString + "\n";
 
-                    console.log('returning: ' + HEADER + display + FOOTER);
+                    console.log(HEADER + display + FOOTER);
 
                     //create Timeout of 2 seconds where the API sends a typing indicator
                     //before it prints the message
@@ -291,8 +315,9 @@ login(credentials, function callback (err, api) {
 
 function formatDateTime(date) {
     // Format month
-    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var dateString = monthNames[date.getMonth()] + " " + date.getDay();
+    var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var daysOfTheWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    var dateString = daysOfTheWeek[date.getDay() - 1] + ", " + monthNames[date.getMonth()] + " " + date.getDate();
 
     // Format hours
     var hour = date.getHours();
@@ -300,6 +325,8 @@ function formatDateTime(date) {
     if (hour > 12) {
         hour -= 12;
         timePostfix = "PM";
+    } else if (hour == 0) {
+        hour = 12;
     }
 
     // Format minutes

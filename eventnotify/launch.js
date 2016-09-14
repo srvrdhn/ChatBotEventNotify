@@ -87,19 +87,6 @@ login(credentials, function callback (err, api) {
 
             var info;
 
-         /*   api.getThreadInfo(event.threadID, callback(err, info)) 
-            if(err) return console.error(err);
-            var ids = info.participantIDs;
-            for(var person in ids) {
-                thisID = ids[person];
-                api.getUserInfo(thisID, function(err, ret) {
-                    if(err) return console.error(err);
-                    for(var prop in ret) {
-                        thisName = ret[prop].firstName;
-                        console.log(thisName);
-                    }
-                });
-            } */
 
             // Get message body
             var text = event.body;

@@ -189,8 +189,9 @@ login(credentials, function callback (err, api) {
                                 var threadID = data[0].userID;
                                 var message = senderName + " invited you to " + eventName;
 
-                                if(location) message = message + " at " + location;
-                                if(date) message = message + " at " + date;
+                                if(location)    message = message + " at " + location;
+
+                                if(date)        message = message + " at " + date;
 
                                 message = message.replace("my", genderPos);
 

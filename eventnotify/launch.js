@@ -59,7 +59,7 @@ login(credentials, function callback (err, api) {
 
     api.setOptions({listenEvents: true});
 
-    var stopListening = api.listen(function(err, event) {
+    api.listen(function(err, event) {
         if(err) return console.error(err);
 
         switch(event.type) {
@@ -77,17 +77,28 @@ login(credentials, function callback (err, api) {
                 var invoked = text.startsWith("EventNotify ");
             }
             if(invoked) {
-
                 console.log('Sending wit message' + text);
-                client.message('@' + text, sessions[sessionId].context)
+                client.message(text.substring(12), sessions[sessionId].context)
                 .then((data) => {
                     console.log('Yay, got Wit.ai response: ' + JSON.stringify(data, null, 4));
                     // console.log('Got wit.ai response!')
 
-                    api.sendMessage(JSON.stringify(data), event.threadID);
+                    console.log();
 
+                    api.sendMessage(JSON.stringify(data, null, 4), event.threadID);
+/*
+                    console.log('Event extracted: ' + response.entities.event, event.threadID);
+                    console.log('Contact(s) extracted: ' + response.entities.contact, event.threadID);
+                    console.log('Datetimes(s) extracted: ' + response.entities.datetime, event.threadID);
+
+                    api.sendMessage('Event extracted: ' + response.entities.event, event.threadID);
+                    api.sendMessage('Contact(s) extracted: ' + response.entities.contact, event.threadID);
+                    api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime, event.threadID);
+*/
                 })
                 .catch(console.error);
+            } else {
+                console.log('No invocation on message: ' + text);
             }
             break;
 

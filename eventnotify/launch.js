@@ -206,18 +206,35 @@ login(credentials, function callback (err, api) {
 
                     // Retrieve participants
                     if (res.hasOwnProperty('contact')) {
+                        var contactArray = [];
+                        console.log(res.contact[1]);
                         for (var i = 0; i < res.contact.length; i++) {
-                            var c = res.contact[i];
-                            console.log('Contact(s) extracted: ' + c.value);
-                            display += 'Contact(s) extracted: ' + c.value + "\n";
-                            api.getUserID(c.value.substring(1), function(err, data) {
+                            if (res.contact[i].value.lastIndexOf("@") == 0) {
+                                contactArray.push(res.contact[i].value);
+                            }
+                            else {
+                                var splitContacts = res.contact[i].value.split(" ");
+                                for (var k = 0; k < splitContacts.length; k++) {
+                                    contactArray.push(splitContacts[k]);
+                                }
+                            }
+                        }
+                        for (var i = 0; i < contactArray.length; i++) {
+                            var c = contactArray[i];
+                            console.log('Contact(s) extracted: ' + c);
+                            display += 'Contact(s) extracted: ' + c + "\n";
+                            api.getUserID(c.substring(1), function(err, data) {
                                 if(err) return callback(err);
                                 // Send the message to the best match (best by Facebook's criteria)
                                 var threadID = data[0].userID;
                                 var message = senderName + " invited you to " + eventName;
 
                                 if(location)    message = message + " at " + location;  
-                                if(date)        message = message + " at " + date;
+                                if(date) {
+                                    var dateObj  = new Date(date);
+                                    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                                    message = message + " on " + monthNames[dateObj.getMonth()] + " " + dateObj.getDay() + ", " + dateObj.getFullYear();
+                                }
 
                                 message = message.replace("my", genderPos);
 

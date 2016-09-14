@@ -81,7 +81,7 @@ login(credentials, function callback (err, api) {
                     senderName = ret[prop].firstName;
                     if(ret[prop].gender != 2) genderPos = "her";
                     console.log(ret[prop].gender);
-                }            
+                }
             });
 
             var sessionId = findOrCreateSession(sender);
@@ -92,8 +92,10 @@ login(credentials, function callback (err, api) {
             var display = '';
 
             /**************************************************************
-             * -------------------- PARSE USER INPUT -------------------- *
-             **************************************************************/
+            * -------------------- PARSE USER INPUT -------------------- *
+            **************************************************************/
+
+            if (!text) break;
 
             // Display current events UI upon "EventNotify"
 
@@ -173,7 +175,7 @@ login(credentials, function callback (err, api) {
 
                                 api.sendMessage(message, threadID);
                                 api.sendMessage("Can you make it?", threadID);
-                         });
+                            });
                         }
                     } else {
                         console.log('No contacts found.');

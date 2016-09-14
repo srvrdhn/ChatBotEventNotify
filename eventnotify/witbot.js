@@ -5,6 +5,8 @@
 const Wit = require('node-wit').Wit;
 const Config = require('../const.js');
 
+var token = 'V3CQ6KG2MP63RCR4SOEVF67IUTVZ3QUP';
+
 const firstEntityValue = (entities, entity) => {
     const val = entities && entities[entity] &&
     Array.isArray(entities[entity]) &&
@@ -18,13 +20,25 @@ const firstEntityValue = (entities, entity) => {
 
 // Bot actions
 const actions = {
+
     send(request, response) {
-        const {sessionId, context, entities} = request;
-        const {text, quickreplies} = response;
+      return new Promise(function(resolve, reject) {
+        console.log(JSON.stringify(response));
+        return resolve();
+      });
+    },
+    createEvent({sessionId, context, text, entities}) {
+      console.log('Session ${sessionId} received ${text}');
+      console.log('The current context is ${JSON.stringify(context)}');
+      console.log('Wit extracted ${JSON.stringify(entities)}');
+      return Promise.resolve(context);
+    }
+
+    /*
+    createEvent(request) {
         return new Promise(function(resolve, reject) {
-            console.log('user said...', request.text);
-            console.log('sending...', JSON.stringify(response));
-            return resolve();
+            console.log('In createEvent');
+            return resolve(context);
         });
     },
     say(sessionId, context, message, cb) {
@@ -48,12 +62,15 @@ const actions = {
 
     error(sessionId, context, error) {
         console.log(error.message);
-    }
+    },
+    send(request, response) {
+
+    }*/
 };
 
 
 const getWit = () => {
-    return new Wit(Config.WIT_TOKEN, actions);
+    return new Wit({token, actions});
 };
 
 exports.getWit = getWit;

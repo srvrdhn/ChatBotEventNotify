@@ -3,18 +3,29 @@
 var login = require('../index.js');
 var fs = require('fs');
 var assert = require('assert');
-
-// Wit.ai integration
-const bot = require('./witbot.js');
-const Config = require('../const.js');
-
-//Create a new Wit bot instance
-const Wit = bot.getWit();
+const {Wit, log} = require('node-wit');
 
 // Will contain all user sessions.
 // Each session has an entry:
 // sessionId -> {fbid: facebookUserId, context: sessionState}
 const sessions = {};
+
+
+const actions = {
+
+    send(request, response) {
+        return new Promise(function(resolve, reject) {
+            console.log(JSON.stringify(response));
+            return resolve();
+        });
+    },
+    createEvent({sessionId, context, text, entities}) {
+        console.log('Session ${sessionId} received ${text}');
+        console.log('The current context is ${JSON.stringify(context)}');
+        console.log('Wit extracted ${JSON.stringify(entities)}');
+        return Promise.resolve(context);
+    }
+};
 
 /**
 * Returns the session for the specified fbid.
@@ -50,6 +61,15 @@ var credentials = {
     password: conf.user.password,
 };
 
+// Create new Wit ai instance
+console.log('Attempting to launch witbot ' + conf.user.serverAccessToken);
+const client = new Wit({
+    accessToken: conf.user.serverAccessToken,
+    actions,
+    logger: new log.Logger(log.DEBUG) // optional
+});
+
+
 /**
 * Logs into the bot's FB account, provides callback method that parses user
 * input and sends it to wit.ai for NLP processing.
@@ -82,22 +102,14 @@ login(credentials, function callback (err, api) {
             // Run wit.ai when invoked with "EventNotify ..."
             var invoked = text.startsWith("EventNotify ");
             if(invoked) {
-                var request = text.substring(12); // Trim prefix
 
-                Wit.runActions(sessionId,
-                    '@EventNotify ' + text,
-                    sessions[sessionId].context,
-                    (error, context) => {
-                        if (error) {
-                            console.error('Got error from wit: ' + error);
-                        } else {
-                            console.log('No error from wit.');
-                        }
-                    }
-                );
-
-                api.sendMessage("Request recieved: " + request, event.threadID);
-                console.log('New invocation: ' + event.body);
+                console.log('Sending wit message' + text);
+                client.message('@' + text, sessions[sessionId].context)
+                .then((data) => {
+                    console.log('Yay, got Wit.ai response: ' + JSON.stringify(data, null, 4));
+                    // console.log('Got wit.ai response!')
+                })
+                .catch(console.error);
             }
             break;
 

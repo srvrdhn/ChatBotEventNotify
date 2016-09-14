@@ -28,7 +28,6 @@
     "request": "^2.53.0",
     "isomorphic-fetch": "^2.2.1",
     "body-parser": "^1.15.0",
-    "node-wit": "^3.2.2",
     "node-uuid": "^1.4.7"
   },
   "engines": {

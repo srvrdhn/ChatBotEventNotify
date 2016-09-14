@@ -212,13 +212,11 @@ login(credentials, function callback (err, api) {
                             display += 'Contact(s) extracted: ' + c.value + "\n";
                             api.getUserID(c.value.substring(1), function(err, data) {
                                 if(err) return callback(err);
-
                                 // Send the message to the best match (best by Facebook's criteria)
                                 var threadID = data[0].userID;
                                 var message = senderName + " invited you to " + eventName;
 
-                                if(location)    message = message + " at " + location;
-
+                                if(location)    message = message + " at " + location;  
                                 if(date)        message = message + " at " + date;
 
                                 message = message.replace("my", genderPos);
@@ -232,7 +230,18 @@ login(credentials, function callback (err, api) {
                     }
 
                     console.log('returning: ' + HEADER + display + FOOTER);
-                    api.sendMessage(HEADER + display + FOOTER, event.threadID);
+
+                    //create Timeout of 2 seconds where the API sends a typing indicator 
+                    //before it prints the message
+                    setTimeout(function() {
+                        api.sendTypingIndicator(event.threadID, function(err) {
+                            if (err)
+                                console.error("Typing indicator error");
+                            sendMessage(api, HEADER + display + FOOTER, event.threadID);
+
+                        });
+                    }, 1500);
+
                 })
                 .catch(console.error);
             } else {
@@ -247,6 +256,13 @@ login(credentials, function callback (err, api) {
     });
 });
 
+function sendMessage(api, message, threadID){
+    api.sendTypingIndicator(threadID, function(err) {
+        if (err)
+            console.error("removing typing indicator error");
+         api.sendMessage(message, threadID);
+    })
+}
 
 function displayEvents() {
     return "Your group's events go here";

@@ -83,33 +83,37 @@ login(credentials, function callback (err, api) {
 
                     console.log();
 
-                    var response = data;
+                    // Get entities, which include events, times, etc.
+                    var res = data.entities;
 
-                    var contacts = [];
-                    var date;
-                    var eventName;
+                    var contacts = [];  // Holds all found participants
+                    var date;           // Datetime for the event
+                    var eventName;      // Event name
+                    var location;       // Event location
 
-                    if (response.entities.hasOwnProperty('event')) {
-                        console.log('Event extracted: ' + response.entities.event[0].value, event.threadID);
-                        api.sendMessage('Event extracted: ' + response.entities.event[0].value, event.threadID);
-                        eventName = response.entities.event[0].value;
+                    // Retrieve event name
+                    if (res.hasOwnProperty('event')) {
+                        console.log('Event extracted: ' + res.event[0].value);
+                        api.sendMessage('Event extracted: ' + res.event[0].value, event.threadID);
+                        eventName = res.event[0].value;
                     } else {
                         console.log('No events found.');
                     }
 
-                    
-                    if (response.entities.hasOwnProperty('datetime')) {
-                        console.log('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
-                        api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
-                        date = response.entities.datetime[0].value;
+                    // Retrieve datetime
+                    if (res.hasOwnProperty('datetime')) {
+                        console.log('Datetimes(s) extracted: ' + res.datetime[0].value);
+                        api.sendMessage('Datetimes(s) extracted: ' + res.datetime[0].value, event.threadID);
+                        date = res.datetime[0].value;
                     } else {
                         console.log('No datetimes found.');
-                    }
+                    })
 
-                    if (response.entities.hasOwnProperty('contact')) {
-                        for (var i = 0; i < response.entities.contact.length; i++) {
-                            var c = response.entities.contact[i];
-                            console.log('Contact(s) extracted: ' + c.value, event.threadID);
+                    // Retrieve participants
+                    if (res.hasOwnProperty('contact')) {
+                        for (var i = 0; i < res.contact.length; i++) {
+                            var c = res.contact[i];
+                            console.log('Contact(s) extracted: ' + c.value);
                             api.sendMessage('Contact(s) extracted: ' + c.value, event.threadID);
                             api.getUserID(c.value.substring(1), function(err, data) {
                                 if(err) return callback(err);
@@ -121,8 +125,6 @@ login(credentials, function callback (err, api) {
                     } else {
                         console.log('No contacts found.');
                     }
-
-
                 })
                 .catch(console.error);
             } else {

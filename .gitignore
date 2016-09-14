@@ -1,1 +1,8 @@
-node_modules/
+credentials.json
+node_modules/*
+*.o
+*.swp
+*.swo
+*.DS_Store
+.DS_Store
+*.*~

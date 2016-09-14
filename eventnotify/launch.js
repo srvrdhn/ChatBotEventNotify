@@ -12,6 +12,7 @@ const sessions = {};
 
 // Padding constants
 const HEADER = '~~~~~~~~ EventNotify ~~~~~~~\n';
+const NEW_EVENT = '        NEW EVENT CREATED!';
 const FOOTER = '~~~~~~~~~~~~~~~~~~~~~~~~~';
 
 
@@ -159,6 +160,7 @@ login(credentials, function callback (err, api) {
                     var res = data.entities;
 
                     var contacts = [];  // Holds all found participants
+                    var contactString = ''; // Formatted string of contacts
                     var date;           // Datetime for the event
                     var dateString;     // Formatted date
                     var eventName;      // Event name
@@ -166,8 +168,11 @@ login(credentials, function callback (err, api) {
 
                     // Retrieve event name
                     if (res.hasOwnProperty('event')) {
+
+                        display += NEW_EVENT + "\n";
+
                         console.log('Event extracted: ' + res.event[0].value);
-                        display += 'Event extracted: ' + res.event[0].value + "\n";
+                        display += 'What: ' + res.event[0].value + "\n";
                         eventName = res.event[0].value;
                     } else {
                         console.log('No events found.');
@@ -176,7 +181,7 @@ login(credentials, function callback (err, api) {
                     // Retrieve location
                     if (res.hasOwnProperty('location')) {
                         console.log('Location extracted: ' + res.location[0].value);
-                        display += 'Location extracted: ' + res.location[0].value + "\n";
+                        display += 'Where: ' + res.location[0].value + "\n";
                         location = res.location.value;
                     } else {
                         console.log('No locations found.');
@@ -185,7 +190,7 @@ login(credentials, function callback (err, api) {
                     // Retrieve local_search_query
                     if (res.hasOwnProperty('local_search_query')) {
                         console.log('Local search query extracted: ' + res.local_search_query[0].value);
-                        display += 'Local search query extracted: ' + res.local_search_query[0].value + "\n";
+                        display += 'Where: ' + res.local_search_query[0].value + "\n";
                         location = res.local_search_query[0].value;
                     }
 
@@ -194,7 +199,7 @@ login(credentials, function callback (err, api) {
                         var dateSplit = res.datetime[0].value.split("T");
                         date = new Date(Date.parse(dateSplit[0] + " " + dateSplit[1].substring(0, 5)));
                         dateString = formatDateTime(date);
-                        display += "Time: " + dateString + "\n";
+                        display += "When: " + dateString + "\n";
                         console.log("Date string: " + dateString);
                     } else {
                         console.log('No datetimes found.');
@@ -219,7 +224,20 @@ login(credentials, function callback (err, api) {
                         for (var i = 0; i < contacts.length; i++) {
                             var c = contacts[i];
                             console.log('Contact(s) extracted: ' + c);
-                            display += 'Contact invited: ' + c + "\n";
+
+                            if (i == contacts.length - 2) {
+                                if (contacts.length == 2) {
+                                    contactString += c.substring(1) + ' and ';
+                                } else {
+                                    contactString += c.substring(1) + ', and ';
+                                }
+                            }
+                            else if (i < contacts.length - 2) {
+                                contactString += c.substring(1) + ', ';
+                            } else {
+                                contactString += c.substring(1) + '.';
+                            }
+
                             api.getUserID(c.substring(1), function(err, data) {
                                 if(err) return callback(err);
 
@@ -241,6 +259,8 @@ login(credentials, function callback (err, api) {
                     } else {
                         console.log('No contacts found.');
                     }
+
+                    display += "Who: " + contactString + "\n";
 
                     console.log('returning: ' + HEADER + display + FOOTER);
 

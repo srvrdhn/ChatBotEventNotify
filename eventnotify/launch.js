@@ -77,25 +77,37 @@ login(credentials, function callback (err, api) {
                 var invoked = text.startsWith("EventNotify ");
             }
             if(invoked) {
-                console.log('Sending wit message' + text);
                 client.message(text.substring(12), sessions[sessionId].context)
                 .then((data) => {
                     console.log('Yay, got Wit.ai response: ' + JSON.stringify(data, null, 4));
-                    // console.log('Got wit.ai response!')
 
                     console.log();
 
-                    var response = JSON.parse(data);
+                    var response = data;
 
-//                    api.sendMessage(JSON.stringify(data, null, 4), event.threadID);
+                    if (response.entities.hasOwnProperty('event')) {
+                        console.log('Event extracted: ' + response.entities.event[0].value, event.threadID);
+                        api.sendMessage('Event extracted: ' + response.entities.event[0].value, event.threadID);
+                    } else {
+                        console.log('No events found.');
+                    }
 
-                    console.log('Event extracted: ' + response.entities.event, event.threadID);
-                    console.log('Contact(s) extracted: ' + response.entities.contact, event.threadID);
-                    console.log('Datetimes(s) extracted: ' + response.entities.datetime, event.threadID);
+                    if (response.entities.hasOwnProperty('contact')) {
+                        for (var i = 0; i < response.entities.contact.length; i++) {
+                            var c = response.entities.contact[i];
+                            console.log('Contact(s) extracted: ' + c.value, event.threadID);
+                            api.sendMessage('Contact(s) extracted: ' + c.value, event.threadID);
+                        }
+                    } else {
+                        console.log('No contacts found.');
+                    }
 
-                    api.sendMessage('Event extracted: ' + response.entities.event, event.threadID);
-                    api.sendMessage('Contact(s) extracted: ' + response.entities.contact, event.threadID);
-                    api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime, event.threadID);
+                    if (response.entities.hasOwnProperty('datetime')) {
+                        console.log('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
+                        api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
+                    } else {
+                        console.log('No datetimes found.');
+                    }
 
                 })
                 .catch(console.error);

@@ -164,8 +164,6 @@ login(credentials, function callback (err, api) {
                     var eventName;      // Event name
                     var location;       // Event location
 
-                    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
                     // Retrieve event name
                     if (res.hasOwnProperty('event')) {
                         console.log('Event extracted: ' + res.event[0].value);
@@ -194,12 +192,10 @@ login(credentials, function callback (err, api) {
                     // Retrieve datetime
                     if (res.hasOwnProperty('datetime')) {
                         var dateSplit = res.datetime[0].value.split("T");
-
-                        console.log('Date parsed: ' + dateSplit[0] + " " + dateSplit[1].substring(0, 5));
-
                         date = new Date(Date.parse(dateSplit[0] + " " + dateSplit[1].substring(0, 5)));
                         dateString = formatDateTime(date);
                         display += "Time: " + dateString + "\n";
+                        console.log("Date string: " + dateString);
                     } else {
                         console.log('No datetimes found.');
                     }
@@ -272,6 +268,27 @@ login(credentials, function callback (err, api) {
         }
     });
 });
+
+function formatDateTime(date) {
+    // Format month
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var dateString = monthNames[date.getMonth()] + " " + date.getDay();
+
+    // Format hours
+    var hour = date.getHours();
+    var timePostfix = "AM";
+    if (hour > 12) {
+        hour -= 12;
+        timePostfix = "PM";
+    }
+
+    // Format minutes
+    var minString = "" + date.getMinutes();
+    if (minString.length == 1) minString = "0" + minString;
+
+    dateString += " at " + hour + ":" + minString + " " + timePostfix;
+    return dateString;
+}
 
 function sendMessage(api, message, threadID){
     api.sendTypingIndicator(threadID, function(err) {

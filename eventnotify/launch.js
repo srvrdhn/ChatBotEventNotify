@@ -85,11 +85,25 @@ login(credentials, function callback (err, api) {
 
                     var response = data;
 
+                    var contacts = [];
+                    var date;
+                    var eventName;
+
                     if (response.entities.hasOwnProperty('event')) {
                         console.log('Event extracted: ' + response.entities.event[0].value, event.threadID);
                         api.sendMessage('Event extracted: ' + response.entities.event[0].value, event.threadID);
+                        eventName = response.entities.event[0].value;
                     } else {
                         console.log('No events found.');
+                    }
+
+                    
+                    if (response.entities.hasOwnProperty('datetime')) {
+                        console.log('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
+                        api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
+                        date = response.entities.datetime[0].value;
+                    } else {
+                        console.log('No datetimes found.');
                     }
 
                     if (response.entities.hasOwnProperty('contact')) {
@@ -97,17 +111,17 @@ login(credentials, function callback (err, api) {
                             var c = response.entities.contact[i];
                             console.log('Contact(s) extracted: ' + c.value, event.threadID);
                             api.sendMessage('Contact(s) extracted: ' + c.value, event.threadID);
+                            api.getUserID(c.value.substring(1), function(err, data) {
+                                if(err) return callback(err);
+                                // Send the message to the best match (best by Facebook's criteria)
+                                var threadID = data[0].userID;
+                                api.sendMessage("Come to " + eventName + " at " + date, threadID);
+                         });
                         }
                     } else {
                         console.log('No contacts found.');
                     }
 
-                    if (response.entities.hasOwnProperty('datetime')) {
-                        console.log('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
-                        api.sendMessage('Datetimes(s) extracted: ' + response.entities.datetime[0].value, event.threadID);
-                    } else {
-                        console.log('No datetimes found.');
-                    }
 
                 })
                 .catch(console.error);

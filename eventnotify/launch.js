@@ -240,7 +240,7 @@ login(credentials, function callback (err, api) {
                             sendMessage(api, HEADER + display + FOOTER, event.threadID);
 
                         });
-                    }, 1500);
+                    }, 0);
 
                 })
                 .catch(console.error);

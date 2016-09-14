@@ -1,0 +1,118 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'https://github.com/Schmavery/facebook-chat-api' ]
+2 info using npm@3.10.3
+3 info using node@v6.5.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData https://github.com/Schmavery/facebook-chat-api
+8 silly fetchOtherPackageData https://github.com/Schmavery/facebook-chat-api
+9 silly cache add args [ 'https://github.com/Schmavery/facebook-chat-api', null ]
+10 verbose cache add spec https://github.com/Schmavery/facebook-chat-api
+11 silly cache add parsed spec Result {
+11 silly cache add   raw: 'https://github.com/Schmavery/facebook-chat-api',
+11 silly cache add   scope: null,
+11 silly cache add   escapedName: null,
+11 silly cache add   name: null,
+11 silly cache add   rawSpec: 'https://github.com/Schmavery/facebook-chat-api',
+11 silly cache add   spec: 'git+https://github.com/Schmavery/facebook-chat-api.git',
+11 silly cache add   type: 'hosted',
+11 silly cache add   hosted:
+11 silly cache add    { type: 'github',
+11 silly cache add      ssh: 'git@github.com:Schmavery/facebook-chat-api.git',
+11 silly cache add      sshUrl: 'git+ssh://git@github.com/Schmavery/facebook-chat-api.git',
+11 silly cache add      httpsUrl: 'git+https://github.com/Schmavery/facebook-chat-api.git',
+11 silly cache add      gitUrl: 'git://github.com/Schmavery/facebook-chat-api.git',
+11 silly cache add      shortcut: 'github:Schmavery/facebook-chat-api',
+11 silly cache add      directUrl: 'https://raw.githubusercontent.com/Schmavery/facebook-chat-api/master/package.json' } }
+12 verbose addRemoteGit caching https://github.com/Schmavery/facebook-chat-api
+13 verbose addRemoteGit git+https://github.com/Schmavery/facebook-chat-api.git is a repository hosted by github
+14 silly tryClone cloning git+https://github.com/Schmavery/facebook-chat-api.git via git+https://github.com/Schmavery/facebook-chat-api.git
+15 verbose tryClone git-https-github-com-Schmavery-facebook-chat-api-git-f6d10c72 not in flight; caching
+16 verbose correctMkdir C:\Users\Chirag\AppData\Roaming\npm-cache\_git-remotes correctMkdir not in flight; initializing
+17 info git [ 'config', '--get', 'remote.origin.url' ]
+18 silly validateExistingRemote git+https://github.com/Schmavery/facebook-chat-api.git remote.origin.url: https://github.com/Schmavery/facebook-chat-api.git
+19 verbose validateExistingRemote git+https://github.com/Schmavery/facebook-chat-api.git is updating existing cached remote C:\Users\Chirag\AppData\Roaming\npm-cache\_git-remotes\git-https-github-com-Schmavery-facebook-chat-api-git-f6d10c72
+20 info git [ 'fetch', '-a', 'origin' ]
+21 verbose updateRemote git fetch -a origin (https://github.com/Schmavery/facebook-chat-api.git)
+22 verbose setPermissions git+https://github.com/Schmavery/facebook-chat-api.git skipping chownr on Windows
+23 verbose resolveHead git+https://github.com/Schmavery/facebook-chat-api.git original treeish: master
+24 info git [ 'rev-list', '-n1', 'master' ]
+25 silly resolveHead git+https://github.com/Schmavery/facebook-chat-api.git resolved treeish: c7ccb343d6ae034838d0d3b3d395c6db78223f6d
+26 verbose resolveHead git+https://github.com/Schmavery/facebook-chat-api.git resolved Git URL: git+https://github.com/Schmavery/facebook-chat-api.git#c7ccb343d6ae034838d0d3b3d395c6db78223f6d
+27 silly resolveHead Git working directory: C:\Users\Chirag\AppData\Local\Temp\npm-172408-9df77123\git-cache-180495b9\c7ccb343d6ae034838d0d3b3d395c6db78223f6d
+28 info git [ 'clone',
+28 info git   'C:\\Users\\Chirag\\AppData\\Roaming\\npm-cache\\_git-remotes\\git-https-github-com-Schmavery-facebook-chat-api-git-f6d10c72',
+28 info git   'C:\\Users\\Chirag\\AppData\\Local\\Temp\\npm-172408-9df77123\\git-cache-180495b9\\c7ccb343d6ae034838d0d3b3d395c6db78223f6d' ]
+29 verbose cloneResolved git+https://github.com/Schmavery/facebook-chat-api.git clone Cloning into 'C:\Users\Chirag\AppData\Local\Temp\npm-172408-9df77123\git-cache-180495b9\c7ccb343d6ae034838d0d3b3d395c6db78223f6d'...
+29 verbose cloneResolved done.
+30 info git [ 'checkout', 'c7ccb343d6ae034838d0d3b3d395c6db78223f6d' ]
+31 verbose checkoutTreeish git+https://github.com/Schmavery/facebook-chat-api.git checkout Note: checking out 'c7ccb343d6ae034838d0d3b3d395c6db78223f6d'.
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish You are in 'detached HEAD' state. You can look around, make experimental
+31 verbose checkoutTreeish changes and commit them, and you can discard any commits you make in this
+31 verbose checkoutTreeish state without impacting any branches by performing another checkout.
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish If you want to create a new branch to retain commits you create, you may
+31 verbose checkoutTreeish do so (now or later) by using -b with the checkout command again. Example:
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish   git checkout -b <new-branch-name>
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish HEAD is now at c7ccb34... Merge pull request #332 from Mini-Geek/master
+32 info git [ 'submodule', '-q', 'update', '--init', '--recursive' ]
+33 verbose updateSubmodules git+https://github.com/Schmavery/facebook-chat-api.git submodule update
+34 verbose addLocalDirectory C:\Users\Chirag\AppData\Roaming\npm-cache\facebook-chat-api\1.2.0\package.tgz not in flight; packing
+35 verbose correctMkdir C:\Users\Chirag\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+36 verbose tar pack [ 'C:\\Users\\Chirag\\AppData\\Roaming\\npm-cache\\facebook-chat-api\\1.2.0\\package.tgz',
+36 verbose tar pack   'C:\\Users\\Chirag\\AppData\\Local\\Temp\\npm-172408-9df77123\\git-cache-180495b9\\c7ccb343d6ae034838d0d3b3d395c6db78223f6d' ]
+37 verbose tarball C:\Users\Chirag\AppData\Roaming\npm-cache\facebook-chat-api\1.2.0\package.tgz
+38 verbose folder C:\Users\Chirag\AppData\Local\Temp\npm-172408-9df77123\git-cache-180495b9\c7ccb343d6ae034838d0d3b3d395c6db78223f6d
+39 verbose addLocalTarball adding from inside cache C:\Users\Chirag\AppData\Roaming\npm-cache\facebook-chat-api\1.2.0\package.tgz
+40 verbose correctMkdir C:\Users\Chirag\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+41 verbose addRemoteGit data._from: git+https://github.com/Schmavery/facebook-chat-api.git
+42 verbose addRemoteGit data._resolved: git+https://github.com/Schmavery/facebook-chat-api.git#c7ccb343d6ae034838d0d3b3d395c6db78223f6d
+43 silly cache afterAdd facebook-chat-api@1.2.0
+44 verbose afterAdd C:\Users\Chirag\AppData\Roaming\npm-cache\facebook-chat-api\1.2.0\package\package.json not in flight; writing
+45 verbose correctMkdir C:\Users\Chirag\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+46 verbose afterAdd C:\Users\Chirag\AppData\Roaming\npm-cache\facebook-chat-api\1.2.0\package\package.json written
+47 silly install normalizeTree
+48 silly loadCurrentTree Finishing
+49 silly loadIdealTree Starting
+50 silly install loadIdealTree
+51 silly cloneCurrentTree Starting
+52 silly install cloneCurrentTreeToIdealTree
+53 silly cloneCurrentTree Finishing
+54 silly loadShrinkwrap Starting
+55 silly install loadShrinkwrap
+56 silly loadShrinkwrap Finishing
+57 silly loadAllDepsIntoIdealTree Starting
+58 silly install loadAllDepsIntoIdealTree
+59 silly rollbackFailedOptional Starting
+60 silly rollbackFailedOptional Finishing
+61 silly runTopLevelLifecycles Starting
+62 silly runTopLevelLifecycles Finishing
+63 silly install printInstalled
+64 verbose stack Error: Refusing to install facebook-chat-api as a dependency of itself
+64 verbose stack     at checkSelf (C:\Program Files\nodejs\node_modules\npm\lib\install\validate-args.js:53:14)
+64 verbose stack     at Array.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\slide\lib\bind-actor.js:15:8)
+64 verbose stack     at LOOP (C:\Program Files\nodejs\node_modules\npm\node_modules\slide\lib\chain.js:15:14)
+64 verbose stack     at chain (C:\Program Files\nodejs\node_modules\npm\node_modules\slide\lib\chain.js:20:5)
+64 verbose stack     at C:\Program Files\nodejs\node_modules\npm\lib\install\validate-args.js:16:5
+64 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\slide\lib\async-map.js:52:35
+64 verbose stack     at Array.forEach (native)
+64 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\slide\lib\async-map.js:52:11
+64 verbose stack     at Array.forEach (native)
+64 verbose stack     at asyncMap (C:\Program Files\nodejs\node_modules\npm\node_modules\slide\lib\async-map.js:51:8)
+65 verbose cwd C:\Users\Chirag\Documents\ChatBotEventNotify\ChatBotEventNotify
+66 error Windows_NT 10.0.14393
+67 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "https://github.com/Schmavery/facebook-chat-api"
+68 error node v6.5.0
+69 error npm  v3.10.3
+70 error code ENOSELF
+71 error Refusing to install facebook-chat-api as a dependency of itself
+72 error If you need help, you may report this error at:
+72 error     <https://github.com/npm/npm/issues>
+73 verbose exit [ 1, true ]

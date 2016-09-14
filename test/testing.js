@@ -30,6 +30,13 @@ login({email: "USERNAME", password: "PASS"}, function callback (err, api) {
             if(n != -1) {
               api.sendMessage("Suh dude", event.threadID);
 
+
+              //Personal Message triggers on "suh" call. Searches for sample user name and 
+              //then sends a message to that user. The user is based on facebook's graph 
+              //search of the user. 
+
+              //TODO: Improve based on https://github.com/Schmavery/facebook-chat-api/blob/master/DOCS.md#getFriendsList
+              //friends list (cross reference userIDS until matches).
               api.getUserID("USER NAME", function(err, data) {
                 console.log(data);
                 if(err) return callback(err);

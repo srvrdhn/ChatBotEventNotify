@@ -73,11 +73,14 @@ login(credentials, function callback (err, api) {
             // Get uesr's fbid and get their session
             var sender = event.senderID;
             var senderName;
+            var genderPos = "his";
 
             api.getUserInfo(sender, function(err, ret) {
                 if(err) return console.error(err);
                 for(var prop in ret) {
                     senderName = ret[prop].firstName;
+                    if(ret[prop].gender == 2) genderPos = "her";
+                    console.log(ret[prop].gender);
                 }
             });
 
@@ -95,7 +98,8 @@ login(credentials, function callback (err, api) {
             if (!text) break;
 
             // Display current events UI upon "EventNotify"
-            if (text.toLowerCase() === "eventnotify") {
+
+            if (text && text.toLowerCase() === "eventnotify") {
                 var retval = HEADER + displayEvents() + "\n" + FOOTER;
                 api.sendMessage(retval, event.threadID);
             }
@@ -163,7 +167,13 @@ login(credentials, function callback (err, api) {
                                 if(err) return callback(err);
                                 // Send the message to the best match (best by Facebook's criteria)
                                 var threadID = data[0].userID;
-                                api.sendMessage(senderName + " invited you to " + eventName + " at " + location, threadID);
+                                var message = senderName + " invited you to " + eventName;
+                                if(location) message = message + " at " + location;
+                                if(date) message = message + " at " + date;
+
+                                message = message.replace("my", genderPos);
+
+                                api.sendMessage(message, threadID);
                                 api.sendMessage("Can you make it?", threadID);
                             });
                         }

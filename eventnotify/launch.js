@@ -79,7 +79,7 @@ login(credentials, function callback (err, api) {
                 if(err) return console.error(err);
                 for(var prop in ret) {
                     senderName = ret[prop].firstName;
-                    if(ret[prop].gender == 2) genderPos = "her";
+                    if(ret[prop].gender != 2) genderPos = "her";
                     console.log(ret[prop].gender);
                 }            
             });

@@ -156,7 +156,7 @@ login(credentials, function callback (err, api) {
                 }
                 client.message(toSend, sessions[sessionId].context)
                 .then((data) => {
-                    console.log(JSON.stringify(data, null, 4));
+                    // console.log(JSON.stringify(data, null, 4));
 
                     // Get entities, which include events, times, etc.
                     var res = data.entities;
@@ -223,6 +223,8 @@ login(credentials, function callback (err, api) {
                             else {
                                 var splitContacts = res.contact[i].value.split(" ");
                                 for (var k = 0; k < splitContacts.length; k++) {
+
+                                    //add contact to contacts array
                                     contacts.push(splitContacts[k]);
                                 }
                             }
@@ -261,56 +263,35 @@ login(credentials, function callback (err, api) {
                         }
                     }
 
-                    // Include whole group chat when @all detected or no names
-                    // specified by user.
+                    //create the message to be shown to invitees. 
+                    var message = senderName + " invited you to " + eventName;
+                    if(location)    
+                        message = message + " at " + location;
+                    if(date) 
+                        message = message + " on " + dateString;
+                    message = message.replace("my", genderPos);
+
+                    // if all group members are to be included, search through group members
+                    //and then PM them. If not, PM the current extracted contacts. 
                     if (addAllMembers) {
+                        console.log("adding all members first");
                         contacts = [];  // Clear contacts array
                         api.getThreadInfo(event.threadID, function(err, info) {
                             if (err) return console.error(err);
 
                             var members = info.participantIDs;
+                            contacts = contacts.concat(members);
+                            console.log(members);
 
-                            api.getUserInfo(members, function(err, ret) {
-                                if(err) return console.error(err);
-
-                                for(var prop in ret) {
-                                    if(ret.hasOwnProperty(prop)) {
-                                        contacts.push(ret[prop].firstName);
-                                        console.log(contacts);
-                                    }
-                                }
-                            });
-
-
+                            //send PMS
+                            sendMessages(contacts, api, message);
                         });
                         contactString = 'Everybody in this chat.';
+                    } else {
+                        //send PMS
+                        sendMessages(contacts, api, message);
                     }
 
-                    // TODO: GET THIS TO WORK
-                    // Send PMs to everyone in contacts array.
-                    console.log('Send PM to: ' + contacts);
-                    for (var i = 0; i < contacts.length; i++) {
-                        var c = contacts[i];
-
-                        api.getUserID(c.substring(1), function(err, data) {
-                            if(err) return callback(err);
-
-                            console.log("Sending PM to: " + c.substring(1));
-
-                            // Send the message to the best match (best by Facebook's criteria)
-                            var threadID = data[0].userID;
-                            var message = senderName + " invited you to " + eventName;
-
-                            if(location)    message = message + " at " + location;
-                            if(date) {
-                                message = message + " on " + dateString;
-                            }
-                            message = message.replace("my", genderPos);
-
-                            api.sendMessage(message, threadID);
-                            api.sendMessage("Can you make it?", threadID);
-                        });
-                    }
 
                     if (printContactString) display += "Who: " + contactString + "\n";
 
@@ -340,6 +321,39 @@ login(credentials, function callback (err, api) {
         }
     });
 });
+
+function sendMessages(contacts, api, message){
+    console.log("sending message");
+    for (var i = 0; i < contacts.length; i++) {
+        var c = contacts[i];
+        if (isNaN(c)){//c is a name
+            console.log("sending message based on NAME");
+            console.log(c);
+            if (c.charAt(0) === '@') c = c.substring(1);
+
+            api.getUserID(c, function(err, data) {
+                if(err) return callback(err);
+
+                console.log("Sending PM to: " + c);
+
+                // Send the message to the best match (best by Facebook's criteria)
+                var threadID = data[0].userID;
+                
+
+                sendMessage(api, message, threadID, function (){
+                   sendMessage(api, "Can you make it?", threadID);
+                });
+            });
+        } else { //c is a user id
+            console.log("sending message based on USERID");
+            console.log(c);
+            sendMessage(api, message, c);
+            sendMessage(api, "Can you make it?", c);
+        }
+    }
+}
+
+
 
 function formatDateTime(date) {
     // Format month
@@ -371,11 +385,14 @@ function formatDateTime(date) {
     return dateString;
 }
 
-function sendMessage(api, message, threadID){
+function sendMessage(api, message, threadID, whendone){
     api.sendTypingIndicator(threadID, function(err) {
         if (err)
         console.error("removing typing indicator error");
-        api.sendMessage(message, threadID);
+        api.sendMessage(message, threadID, function() {
+            if (whendone)
+                whendone();
+        });
     })
 }
 

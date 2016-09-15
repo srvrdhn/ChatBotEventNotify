@@ -104,45 +104,47 @@ login(credentials, function callback (err, api) {
 
             if (!text) break;
 
-            var textcheck = text.toLowerCase();
+            if(event.isGroup) {
+                var textcheck = text.toLowerCase();
 
-            // Add Friends to Chat Functionality
-            var ind = textcheck.indexOf("add"); // Index of add
-            if(ind != -1) {
-                var index = textcheck.indexOf(":");     // Index of ':' as reference for name
-                if(index != -1) {
-                    var name = textcheck.substring(index +1, textcheck.length);
-                    name = name.trim(); // Trim whitespace
+                // Add Friends to Chat Functionality
+                var ind = textcheck.indexOf("add"); // Index of add
+                if(ind != -1) {
+                    var index = textcheck.indexOf(":");     // Index of ':' as reference for name
+                    if(index != -1) {
+                        var name = textcheck.substring(index +1, textcheck.length);
+                        name = name.trim(); // Trim whitespace
 
-                    // Get userID from name
-                    api.getUserID(name, function(err, data) {
-                        if(err) return callback(err);
+                        // Get userID from name
+                        api.getUserID(name, function(err, data) {
+                            if(err) return callback(err);
 
-                        // Add by userID
-                        api.addUserToGroup(data[0].userID, event.threadID, function callback(err) {
-                            if(err) return console.error(err);
+                            // Add by userID
+                            api.addUserToGroup(data[0].userID, event.threadID, function callback(err) {
+                                if(err) return console.error(err);
+                            });
                         });
-                    });
-                }   
-            }
+                    }   
+                }
 
-            // Remove Friends from Chat Functionality 
-            var ind = textcheck.indexOf("remove");  // Index of remove
-            if(ind != -1) {
-                var index = textcheck.indexOf(":");     // Index of ':' as reference for name
-                if(index != -1) {
-                    var name = textcheck.substring(index + 1, textcheck.length);
-                    name = name.trim();     // Trim whitespace
+                // Remove Friends from Chat Functionality 
+                var ind = textcheck.indexOf("remove");  // Index of remove
+                if(ind != -1) {
+                    var index = textcheck.indexOf(":");     // Index of ':' as reference for name
+                    if(index != -1) {
+                        var name = textcheck.substring(index + 1, textcheck.length);
+                        name = name.trim();     // Trim whitespace
 
-                    // Get userID from name
-                    api.getUserID(name, function(err, data) {
-                        if(err) return callback(err);
+                        // Get userID from name
+                        api.getUserID(name, function(err, data) {
+                            if(err) return callback(err);
 
-                        // Remove by userID
-                        api.removeUserFromGroup(data[0].userID, event.threadID, function callback(err) {
-                            if(err) return console.error(err);
+                            // Remove by userID
+                            api.removeUserFromGroup(data[0].userID, event.threadID, function callback(err) {
+                                if(err) return console.error(err);
+                            });
                         });
-                    });
+                    }
                 }
             }
 

@@ -13,6 +13,7 @@ const sessions = {};
 // Padding constants
 const HEADER =      '~~~~~~~~ EventNotify ~~~~~~~\n';
 const NEW_EVENT =   '        NEW EVENT CREATED!';
+const NEW_INVITE =  '       NEW EVENT INVITATION!';
 const CUR_EVENTS =  '          CURRENT EVENTS';
 const FOOTER =      '~~~~~~~~~~~~~~~~~~~~~~~~~';
 
@@ -103,30 +104,75 @@ login(credentials, function callback (err, api) {
 
             if (!text) break;
 
-            var ind = text.indexOf("color");
+            var textcheck = text.toLowerCase();
 
+            // Add Friends to Chat Functionality
+            var ind = textcheck.indexOf("add"); // Index of add
             if(ind != -1) {
+                var index = textcheck.indexOf(":");     // Index of ':' as reference for name
+                if(index != -1) {
+                    var name = textcheck.substring(index +1, textcheck.length);
+                    name = name.trim(); // Trim whitespace
 
-                var index = text.indexOf(":");
-                if(index != -1) var change = text.substring(index + 1, text.length);
+                    // Get userID from name
+                    api.getUserID(name, function(err, data) {
+                        if(err) return callback(err);
 
-
-                api.changeThreadColor(change, event.threadID, function callback(err) {
-                    if(err) return console.error(err);
-                });
-
+                        // Add by userID
+                        api.addUserToGroup(data[0].userID, event.threadID, function callback(err) {
+                            if(err) return console.error(err);
+                        });
+                    });
+                }   
             }
 
-            var ind = text.indexOf("emoji");
+            // Remove Friends from Chat Functionality 
+            var ind = textcheck.indexOf("remove");  // Index of remove
+            if(ind != -1) {
+                var index = textcheck.indexOf(":");     // Index of ':' as reference for name
+                if(index != -1) {
+                    var name = textcheck.substring(index + 1, textcheck.length);
+                    name = name.trim();     // Trim whitespace
+
+                    // Get userID from name
+                    api.getUserID(name, function(err, data) {
+                        if(err) return callback(err);
+
+                        // Remove by userID
+                        api.removeUserFromGroup(data[0].userID, event.threadID, function callback(err) {
+                            if(err) return console.error(err);
+                        });
+                    });
+                }
+            }
+
+
+            // Change Chat Color Functionality
+            var ind = textcheck.indexOf("color");   // Index of color
+            if(ind != -1) {
+                var index = textcheck.indexOf(":");     // Index of ':' as reference for color value
+                if(index != -1) {
+                    var color = textcheck.substring(index + 1, textcheck.length);
+                    color = color.trim();   // Trim whitespace
+
+                    // Change color to Hex value inputted
+                    api.changeThreadColor(color, event.threadID, function callback(err) {
+                        if(err) return console.error(err);
+                    });
+                }
+            }
+
+            // Change Emoji Functionality (NOT WORKING)
+            /* var ind = textcheck.indexOf("emoji");
 
             if(ind != -1) {
-                var index = text.indexOf(":");
-                var change = text.substring(index + 1, text.length);
+                var index = textcheck.indexOf(":");
+                var change = textcheck.substring(index + 1, textcheck.length);
 
                 api.changeThreadEmoji(change, event.threadID, function callback(err) {
                     if(err) return console.error(err);
                 });
-            }
+            } */
 
             // Display current events UI upon "EventNotify" or "EN"
             if (text.toLowerCase() === "eventnotify" || text === "EN") {

@@ -164,6 +164,7 @@ login(credentials, function callback (err, api) {
                     var contacts = [];  // Holds all found participants
                     var contactString = ''; // Formatted string of contacts
                     var printContactString = true;  // Whether or not to print contact string
+                    var addAllMembers = false;
 
                     var date;           // Datetime for the event
                     var dateString;     // Formatted date
@@ -205,16 +206,9 @@ login(credentials, function callback (err, api) {
                         console.log(ds);
 
                         var date = new Date(ds[0], --ds[1], ds[2], ds[3], ds[4], ds[5]);
-                        /*date.setFullYear(ds[0]);
-                        date.setMonth(--ds[1]);
-                        date.setDate(ds[2]);
-                        date.setHours(ds[3]);
-                        date.setMinutes(ds[4]);*/
                         console.log('Parsed date object: ' + date);
-                        //date = new Date(Date.parse(ds[0] + " " + dateSplit[1].substring(0, 5)));
                         dateString = formatDateTime(date);
                         display += "When: " + dateString + "\n";
-                        console.log("Date string: " + dateString);
                     } else {
                         console.log('No datetimes found.');
                     }
@@ -239,6 +233,12 @@ login(credentials, function callback (err, api) {
                             var c = contacts[i];
                             console.log('Contact(s) extracted: ' + c);
 
+                            // If "all" detected, skip to addAllMembers
+                            if (c.substring(1).toLowerCase() === 'all') {
+                                addAllMembers = true;
+                                break;
+                            }
+
                             if (i == contacts.length - 2) {
                                 if (contacts.length == 2) {
                                     contactString += c.substring(1) + ' and ';
@@ -251,32 +251,65 @@ login(credentials, function callback (err, api) {
                             } else {
                                 contactString += c.substring(1) + '.';
                             }
-
-                            api.getUserID(c.substring(1), function(err, data) {
-                                if(err) return callback(err);
-
-                                // Send the message to the best match (best by Facebook's criteria)
-                                var threadID = data[0].userID;
-                                var message = senderName + " invited you to " + eventName;
-
-                                if(location)    message = message + " at " + location;
-                                if(date) {
-                                    message = message + " on " + dateString;
-                                }
-
-                                message = message.replace("my", genderPos);
-
-                                api.sendMessage(message, threadID);
-                                api.sendMessage("Can you make it?", threadID);
-                            });
                         }
                     } else {
                         console.log('No contacts found.');
                         if (event.isGroup) {
-                            contactString = 'Everybody in this chat.';
+                            addAllMembers = true;
                         } else {
                             printContactString = false;
                         }
+                    }
+
+                    // Include whole group chat when @all detected or no names
+                    // specified by user.
+                    if (addAllMembers) {
+                        contacts = [];  // Clear contacts array
+                        api.getThreadInfo(event.threadID, function(err, info) {
+                            if (err) return console.error(err);
+
+                            var members = info.participantIDs;
+
+                            api.getUserInfo(members, function(err, ret) {
+                                if(err) return console.error(err);
+
+                                for(var prop in ret) {
+                                    if(ret.hasOwnProperty(prop)) {
+                                        contacts.push(ret[prop].firstName);
+                                        console.log(contacts);
+                                    }
+                                }
+                            });
+
+
+                        });
+                        contactString = 'Everybody in this chat.';
+                    }
+
+                    // TODO: GET THIS TO WORK
+                    // Send PMs to everyone in contacts array.
+                    console.log('Send PM to: ' + contacts);
+                    for (var i = 0; i < contacts.length; i++) {
+                        var c = contacts[i];
+
+                        api.getUserID(c.substring(1), function(err, data) {
+                            if(err) return callback(err);
+
+                            console.log("Sending PM to: " + c.substring(1));
+
+                            // Send the message to the best match (best by Facebook's criteria)
+                            var threadID = data[0].userID;
+                            var message = senderName + " invited you to " + eventName;
+
+                            if(location)    message = message + " at " + location;
+                            if(date) {
+                                message = message + " on " + dateString;
+                            }
+                            message = message.replace("my", genderPos);
+
+                            api.sendMessage(message, threadID);
+                            api.sendMessage("Can you make it?", threadID);
+                        });
                     }
 
                     if (printContactString) display += "Who: " + contactString + "\n";

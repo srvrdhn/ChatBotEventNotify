@@ -91,19 +91,6 @@ login(credentials, function callback (err, api) {
             var info;
 
 
-         /*   api.getThreadInfo(event.threadID, callback(err, info))
-            if(err) return console.error(err);
-            var ids = info.participantIDs;
-            for(var person in ids) {
-                thisID = ids[person];
-                api.getUserInfo(thisID, function(err, ret) {
-                    if(err) return console.error(err);
-                    for(var prop in ret) {
-                        thisName = ret[prop].firstName;
-                        console.log(thisName);
-                    }
-                });
-            } */
 
             // Get message body
             var text = event.body;
@@ -146,10 +133,13 @@ login(credentials, function callback (err, api) {
             if (text.toLowerCase() === "eventnotify" || text === "EN") {
                 var retval = HEADER + displayEvents() + "\n" + FOOTER;
                 api.sendMessage(retval, event.threadID);
+                break;
             }
 
             if (text.toLowerCase() === "eventnotify help") {
-                api.sendMessage(HEADER + displayHelp() + "\n" + FOOTER, event.threadID);
+                api.sendMessage(HEADER + displayHelp() + "\n" + FOOTER,
+                event.threadID);
+                break;
             }
 
             // Run wit.ai upon "EventNotify ..."
@@ -298,7 +288,7 @@ login(credentials, function callback (err, api) {
                     setTimeout(function() {
                         api.sendTypingIndicator(event.threadID, function(err) {
                             if (err)
-                                console.error("Typing indicator error");
+                            console.error("Typing indicator error");
                             sendMessage(api, HEADER + display + FOOTER, event.threadID);
 
                         });
@@ -327,6 +317,7 @@ function formatDateTime(date) {
     // Format hours
     var hour = date.getHours();
     var timePostfix = "AM";
+    var suppressTime = false;
     if (hour > 12) {
         hour -= 12;
         timePostfix = "PM";
@@ -338,15 +329,20 @@ function formatDateTime(date) {
     var minString = "" + date.getMinutes();
     if (minString.length == 1) minString = "0" + minString;
 
-    dateString += " at " + hour + ":" + minString + " " + timePostfix;
+    // Suppress time output if at midnight
+    if (date.getMinutes() == 0 && hour == 12) {
+        suppressTime = true;
+    }
+
+    if (!suppressTime) dateString += " at " + hour + ":" + minString + " " + timePostfix;
     return dateString;
 }
 
 function sendMessage(api, message, threadID){
     api.sendTypingIndicator(threadID, function(err) {
         if (err)
-            console.error("removing typing indicator error");
-         api.sendMessage(message, threadID);
+        console.error("removing typing indicator error");
+        api.sendMessage(message, threadID);
     })
 }
 
@@ -357,14 +353,14 @@ function displayEvents() {
 
 function displayHelp() {
     var msg = "Welcome to EventNotify!\nThis is a bot that helps you and your"
-                + "\ngroup chat create quick, imprompu events.\n\n"
-                + "To create an event, just start your sentence with 'EventNotify' and talk naturally."
-                + "\nTo invite specific people rather than the whole group chat, "
-                + "tag them with their first name using the @ symbol."
-                + "\nHere are some examples:\n\n"
-                + '"EventNotify basketball next Friday at 9 pm"\n'
-                + '"EventNotify invite @John and @Jane to brunch at my place tomorrow morning"\n'
-                + "\nTry it out!";
+    + "\ngroup chat create quick, imprompu events.\n\n"
+    + "To create an event, just start your sentence with 'EventNotify' and talk naturally."
+    + "\nTo invite specific people rather than the whole group chat, "
+    + "tag them with their first name using the @ symbol."
+    + "\nHere are some examples:\n\n"
+    + '"EventNotify basketball next Friday at 9 pm"\n'
+    + '"EventNotify invite @John and @Jane to brunch at my place tomorrow morning"\n'
+    + "\nTry it out!";
     return msg;
 
 }

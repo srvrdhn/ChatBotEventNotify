@@ -119,7 +119,6 @@ login(credentials, function callback (err, api) {
             var ind = text.indexOf("color");
 
             if(ind != -1) {
-                console.log('understood message');
 
                 var index = text.indexOf(":");
                 if(index != -1) var change = text.substring(index + 1, text.length);
@@ -137,7 +136,7 @@ login(credentials, function callback (err, api) {
                 var index = text.indexOf(":");
                 var change = text.substring(index + 1, text.length);
 
-                api.changeThreadEmoji("💯", "0000000000000", function callback(err) {
+                api.changeThreadEmoji(change, event.threadID, function callback(err) {
                     if(err) return console.error(err);
                 });
             }

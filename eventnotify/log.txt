@@ -1,1 +1,0 @@
-[warn] The 'send' action should accept 3 arguments: sessionId, context, callback. Learn more at https://wit.ai/docs/quickstart

@@ -107,8 +107,10 @@ login(credentials, function callback (err, api) {
 
             // Display current events UI upon "EventNotify" or "EN"
             if (text.toLowerCase() === "eventnotify" || text === "EN") {
-                var retval = HEADER + displayEvents() + "\n" + FOOTER;
-                api.sendMessage(retval, event.threadID);
+                displayEvents(event.threadID, function(msg) {
+                    var retval = HEADER + msg + "\n" + FOOTER;
+                    api.sendMessage(retval, event.threadID);
+                });
                 break;
             }
 
@@ -242,9 +244,9 @@ login(credentials, function callback (err, api) {
                     //create the message to be shown to invitees.
                     var message = senderName + " invited you to " + eventName;
                     if(location)
-                        message = message + " at " + location;
+                    message = message + " at " + location;
                     if(date)
-                        message = message + " on " + dateString;
+                    message = message + " on " + dateString;
                     message = message.replace("my", genderPos);
 
                     // if all group members are to be included, search through group members
@@ -295,8 +297,8 @@ login(credentials, function callback (err, api) {
             break;
 
             case "event":
-                console.log(event);
-                break;
+            console.log(event);
+            break;
         }
     });
 });
@@ -320,7 +322,7 @@ function sendMessages(contacts, api, message){
 
 
                 sendMessage(api, message, threadID, function (){
-                   sendMessage(api, "Can you make it?", threadID);
+                    sendMessage(api, "Can you make it?", threadID);
                 });
             });
         } else { //c is a user id
@@ -370,14 +372,35 @@ function sendMessage(api, message, threadID, whendone){
         console.error("removing typing indicator error");
         api.sendMessage(message, threadID, function() {
             if (whendone)
-                whendone();
+            whendone();
         });
     })
 }
 
-function displayEvents() {
-    var msg = CUR_EVENTS + "\n" + "No events." + "\nTry \"EventNotify help\" for more info.";
-    return msg;
+function displayEvents(group_id, cb) {
+
+    console.log("groupID in displayevents: " + group_id)
+
+    pgquery.queryPostgres('SELECT name FROM events WHERE group_id=$1', [group_id], function(err, resp) {
+        if (err) throw err;
+
+        console.log(resp);
+
+        var output = "";
+        if (resp.length == 0) {
+            output = "No events." + "\nTry \"EventNotify help\" for more info.";
+        } else {
+            for (var i = 0; i < resp.length; i++) {
+                output += (resp[i]).name + "\n";
+            }
+        }
+
+        var msg = CUR_EVENTS + "\n" + output;
+        console.log(msg);
+
+        cb(msg);
+    });
+
 }
 
 function displayHelp() {
@@ -398,7 +421,7 @@ function createEvent(groupId, name, contacts, date) {
     //INSERT INTO films (code, title, did, date_prod, kind)
     //    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
     var query = "INSERT INTO events (group_id, name, people_list, date_event)"
-        + " VALUES ($1, $2, $3, $4)";
+    + " VALUES ($1, $2, $3, $4)";
 
     pgquery.queryPostgres(query, [groupId, name, contacts, date], function(err, resp) {
         if (err) throw err;

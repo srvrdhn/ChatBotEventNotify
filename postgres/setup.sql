@@ -3,5 +3,6 @@ CREATE TABLE events (
 	group_id BIGINT,
 	name VARCHAR(60),
 	people_list INTEGER[],
-	date_event DATE
+	date_event DATE,
+	location VARCHAR(60)
 );

@@ -107,8 +107,8 @@ login(credentials, function callback (err, api) {
 
             // Display current events UI upon "EventNotify" or "EN"
             if (text.toLowerCase() === "eventnotify" || text === "EN") {
-                displayEvents(event.threadID, function(msg) {
-                    var retval = HEADER + msg + "\n" + FOOTER;
+                getCurrentEvents(event.threadID, function(msg) {
+                    var retval = HEADER + msg + FOOTER;
                     api.sendMessage(retval, event.threadID);
                 });
                 break;
@@ -276,7 +276,7 @@ login(credentials, function callback (err, api) {
                     console.log(HEADER + display + FOOTER);
 
                     // Create the event in database
-                    createEvent(event.threadID, eventName, contacts, date);
+                    createEvent(event.threadID, eventName, contacts, date, location);
 
                     //create Timeout of 2 seconds where the API sends a typing indicator
                     //before it prints the message
@@ -377,28 +377,30 @@ function sendMessage(api, message, threadID, whendone){
     })
 }
 
-function displayEvents(group_id, cb) {
+function getCurrentEvents(group_id, cb) {
 
-    console.log("groupID in displayevents: " + group_id)
-
-    pgquery.queryPostgres('SELECT name FROM events WHERE group_id=$1', [group_id], function(err, resp) {
+    pgquery.queryPostgres('SELECT * FROM events WHERE group_id=$1', [group_id], function(err, resp) {
         if (err) throw err;
 
         console.log(resp);
 
         var output = "";
         if (resp.length == 0) {
-            output = "No events." + "\nTry \"EventNotify help\" for more info.";
+            output = "No events." + "\nTry \"EventNotify help\" for more info.\n";
         } else {
             for (var i = 0; i < resp.length; i++) {
-                output += (resp[i]).name + "\n";
+                var e = resp[i];
+                if (e.name) output += 'What: ' + e.name + "\n";
+                if (e.date_event) output += 'When: ' + formatDateTime(e.date_event) + "\n";
+                if (e.location) output += 'Where: ' + e.location + "\n";
+                if (e.people_list) output += 'Who: ' + e.people_list + "\n";
+                output += "\n";
             }
         }
 
         var msg = CUR_EVENTS + "\n" + output;
-        console.log(msg);
 
-        cb(msg);
+        if (cb) cb(msg);
     });
 
 }
@@ -417,13 +419,13 @@ function displayHelp() {
 
 }
 
-function createEvent(groupId, name, contacts, date) {
+function createEvent(groupId, name, contacts, date, location) {
     //INSERT INTO films (code, title, did, date_prod, kind)
     //    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
-    var query = "INSERT INTO events (group_id, name, people_list, date_event)"
-    + " VALUES ($1, $2, $3, $4)";
+    var query = "INSERT INTO events (group_id, name, people_list, date_event, location)"
+    + " VALUES ($1, $2, $3, $4, $5)";
 
-    pgquery.queryPostgres(query, [groupId, name, contacts, date], function(err, resp) {
+    pgquery.queryPostgres(query, [groupId, name, contacts, date, location], function(err, resp) {
         if (err) throw err;
 
         console.log(resp);

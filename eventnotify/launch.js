@@ -390,11 +390,11 @@ function getCurrentEvents(group_id, cb) {
         } else {
             for (var i = 0; i < resp.length; i++) {
                 var e = resp[i];
+                output += "\n";
                 if (e.name) output += 'What: ' + e.name + "\n";
                 if (e.date_event) output += 'When: ' + formatDateTime(e.date_event) + "\n";
                 if (e.location) output += 'Where: ' + e.location + "\n";
-                if (e.people_list) output += 'Who: ' + e.people_list + "\n";
-                output += "\n";
+                //if (e.people_list) output += 'Who: ' + e.people_list + "\n";
             }
         }
 

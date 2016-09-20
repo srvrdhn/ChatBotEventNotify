@@ -1,6 +1,6 @@
 CREATE TABLE events (
 	event_id serial,
-	group_id INT,
+	group_id BIGINT,
 	name VARCHAR(60),
 	people_list INTEGER[],
 	date_event DATE

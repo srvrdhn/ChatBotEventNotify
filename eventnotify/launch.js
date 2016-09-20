@@ -3,6 +3,7 @@
 var login = require('../index.js');
 var fs = require('fs');
 var assert = require('assert');
+var pgquery = require('../postgres/pgquery.js');
 const Wit = require('./witbot.js');
 
 // Will contain all user sessions.
@@ -103,78 +104,6 @@ login(credentials, function callback (err, api) {
             **************************************************************/
 
             if (!text) break;
-
-            if(event.isGroup) {
-                var textcheck = text.toLowerCase();
-
-                // Add Friends to Chat Functionality
-                var ind = textcheck.indexOf("add"); // Index of add
-                if(ind != -1) {
-                    var index = textcheck.indexOf(":");     // Index of ':' as reference for name
-                    if(index != -1) {
-                        var name = textcheck.substring(index +1, textcheck.length);
-                        name = name.trim(); // Trim whitespace
-
-                        // Get userID from name
-                        api.getUserID(name, function(err, data) {
-                            if(err) return callback(err);
-
-                            // Add by userID
-                            api.addUserToGroup(data[0].userID, event.threadID, function callback(err) {
-                                if(err) return console.error(err);
-                            });
-                        });
-                    }   
-                }
-
-                // Remove Friends from Chat Functionality 
-                var ind = textcheck.indexOf("remove");  // Index of remove
-                if(ind != -1) {
-                    var index = textcheck.indexOf(":");     // Index of ':' as reference for name
-                    if(index != -1) {
-                        var name = textcheck.substring(index + 1, textcheck.length);
-                        name = name.trim();     // Trim whitespace
-
-                        // Get userID from name
-                        api.getUserID(name, function(err, data) {
-                            if(err) return callback(err);
-
-                            // Remove by userID
-                            api.removeUserFromGroup(data[0].userID, event.threadID, function callback(err) {
-                                if(err) return console.error(err);
-                            });
-                        });
-                    }
-                }
-            }
-
-
-            // Change Chat Color Functionality
-            var ind = textcheck.indexOf("color");   // Index of color
-            if(ind != -1) {
-                var index = textcheck.indexOf(":");     // Index of ':' as reference for color value
-                if(index != -1) {
-                    var color = textcheck.substring(index + 1, textcheck.length);
-                    color = color.trim();   // Trim whitespace
-
-                    // Change color to Hex value inputted
-                    api.changeThreadColor(color, event.threadID, function callback(err) {
-                        if(err) return console.error(err);
-                    });
-                }
-            }
-
-            // Change Emoji Functionality (NOT WORKING)
-            /* var ind = textcheck.indexOf("emoji");
-
-            if(ind != -1) {
-                var index = textcheck.indexOf(":");
-                var change = textcheck.substring(index + 1, textcheck.length);
-
-                api.changeThreadEmoji(change, event.threadID, function callback(err) {
-                    if(err) return console.error(err);
-                });
-            } */
 
             // Display current events UI upon "EventNotify" or "EN"
             if (text.toLowerCase() === "eventnotify" || text === "EN") {
@@ -310,16 +239,16 @@ login(credentials, function callback (err, api) {
                         }
                     }
 
-                    //create the message to be shown to invitees. 
+                    //create the message to be shown to invitees.
                     var message = senderName + " invited you to " + eventName;
-                    if(location)    
+                    if(location)
                         message = message + " at " + location;
-                    if(date) 
+                    if(date)
                         message = message + " on " + dateString;
                     message = message.replace("my", genderPos);
 
                     // if all group members are to be included, search through group members
-                    //and then PM them. If not, PM the current extracted contacts. 
+                    //and then PM them. If not, PM the current extracted contacts.
                     if (addAllMembers) {
                         console.log("adding all members first");
                         contacts = [];  // Clear contacts array
@@ -344,6 +273,9 @@ login(credentials, function callback (err, api) {
 
                     console.log(HEADER + display + FOOTER);
 
+                    // Create the event in database
+                    createEvent(event.threadID, eventName, contacts, date);
+
                     //create Timeout of 2 seconds where the API sends a typing indicator
                     //before it prints the message
                     setTimeout(function() {
@@ -363,8 +295,8 @@ login(credentials, function callback (err, api) {
             break;
 
             case "event":
-            console.log(event);
-            break;
+                console.log(event);
+                break;
         }
     });
 });
@@ -385,7 +317,7 @@ function sendMessages(contacts, api, message){
 
                 // Send the message to the best match (best by Facebook's criteria)
                 var threadID = data[0].userID;
-                
+
 
                 sendMessage(api, message, threadID, function (){
                    sendMessage(api, "Can you make it?", threadID);
@@ -459,5 +391,19 @@ function displayHelp() {
     + '"EventNotify invite @John and @Jane to brunch at my place tomorrow morning"\n'
     + "\nTry it out!";
     return msg;
+
+}
+
+function createEvent(groupId, name, contacts, date) {
+    //INSERT INTO films (code, title, did, date_prod, kind)
+    //    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
+    var query = "INSERT INTO events (group_id, name, people_list, date_event)"
+        + " VALUES ($1, $2, $3, $4)";
+
+    pgquery.queryPostgres(query, [groupId, name, contacts, date], function(err, resp) {
+        if (err) throw err;
+
+        console.log(resp);
+    });
 
 }

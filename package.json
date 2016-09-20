@@ -28,7 +28,9 @@
     "request": "^2.53.0",
     "isomorphic-fetch": "^2.2.1",
     "body-parser": "^1.15.0",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "^1.4.7",
+    "es6-promise": ">0.0",
+    "pg": ">0.0"
   },
   "engines": {
     "node": "4.x"

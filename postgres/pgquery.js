@@ -4,7 +4,7 @@ module.exports = {
     var pg = require('pg');
 
     var config = {
-      user: 'postgres',
+      user: 'Tejas',
       database: 'ChatBotEventNotify',
       password: '',
       host: 'localhost',
@@ -38,4 +38,3 @@ module.exports = {
 
 // invocation: var pgquery = require('./pgquery.js')
 // query postgres: pgquery.queryPostgres ('SELECT * FROM 1;', [], function (err, resp){ // add code to handle response here })
-

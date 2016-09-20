@@ -66,7 +66,7 @@ const client = Wit.getWit(conf.user.serverAccessToken);
 login(credentials, function callback (err, api) {
     if(err) return console.error(err);
 
-    if(api)    api.setOptions({listenEvents: true});
+    if(api) api.setOptions({listenEvents: true});
 
     if(api)
     api.listen(function(err, event) {
@@ -134,7 +134,7 @@ login(credentials, function callback (err, api) {
                 }
                 client.message(toSend, sessions[sessionId].context)
                 .then((data) => {
-                    // console.log(JSON.stringify(data, null, 4));
+                    console.log(JSON.stringify(data, null, 4));
 
                     // Get entities, which include events, times, etc.
                     var res = data.entities;
@@ -180,7 +180,12 @@ login(credentials, function callback (err, api) {
 
                     // Retrieve datetime
                     if (res.hasOwnProperty('datetime')) {
-                        var ds = res.datetime[0].value.substring(0, 19).split(/T|:|-/)
+                        var ds;
+                        if (res.datetime[0].type === 'interval') {
+                            ds = res.datetime[0].from.value.substring(0, 19).split(/T|:|-/);
+                        } else {
+                            var ds = res.datetime[0].value.substring(0, 19).split(/T|:|-/);
+                        }
                         console.log(ds);
 
                         var date = new Date(ds[0], --ds[1], ds[2], ds[3], ds[4], ds[5]);
@@ -334,8 +339,6 @@ function sendMessages(contacts, api, message){
     }
 }
 
-
-
 function formatDateTime(date) {
     // Format month
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -346,8 +349,16 @@ function formatDateTime(date) {
     var hour = date.getHours();
     var timePostfix = "AM";
     var suppressTime = false;
+
+    // Suppress time output if at midnight
+    if (date.getMinutes() == 0 && hour == 0) {
+        suppressTime = true;
+    }
+
     if (hour > 12) {
         hour -= 12;
+        timePostfix = "PM";
+    } else if (hour == 12) {
         timePostfix = "PM";
     } else if (hour == 0) {
         hour = 12;
@@ -357,10 +368,6 @@ function formatDateTime(date) {
     var minString = "" + date.getMinutes();
     if (minString.length == 1) minString = "0" + minString;
 
-    // Suppress time output if at midnight
-    if (date.getMinutes() == 0 && hour == 12) {
-        suppressTime = true;
-    }
 
     if (!suppressTime) dateString += " at " + hour + ":" + minString + " " + timePostfix;
     return dateString;
@@ -386,7 +393,7 @@ function getCurrentEvents(group_id, cb) {
 
         var output = "";
         if (resp.length == 0) {
-            output = "No events." + "\nTry \"EventNotify help\" for more info.\n";
+            output = 'No events.' + '\nTry "EventNotify help" for more info.\n';
         } else {
             for (var i = 0; i < resp.length; i++) {
                 var e = resp[i];
@@ -420,8 +427,6 @@ function displayHelp() {
 }
 
 function createEvent(groupId, name, contacts, date, location) {
-    //INSERT INTO films (code, title, did, date_prod, kind)
-    //    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
     var query = "INSERT INTO events (group_id, name, people_list, date_event, location)"
     + " VALUES ($1, $2, $3, $4, $5)";
 

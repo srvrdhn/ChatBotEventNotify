@@ -21,11 +21,11 @@ Just say ```EventNotify``` to the bot to see your current group events and ```Ev
 
 ## Installation for Development
 
-To configure EventNotify for development, clone this repository and install the requisite npm packages with ```npm install```
+To configure EventNotify for development, clone this repository and install the required npm packages with ```npm install```.
 
 You then need to create a ```credentials.json``` file in the ```eventnotify``` folder. See the ```eventnotify/sample-credentials.json``` file for a template. This file includes the login for your target Facebook account and the Wit.ai server token you can get from your Wit account.
 
-You need PostgreSQL installed locally to run the database in your development environment. If you are on UNIX, you can run the mac-install.sh shell script to install and configure PostgreSQL.
+You need PostgreSQL installed locally to run the database in your development environment. If you are on UNIX, you can run the ```mac-install.sh``` shell script to install and configure PostgreSQL. You must now change the name in ```postgres/pgquery.js``` to your name in your Postgres settings.
 
 Now code away (start at ```eventnotify/launch.js```), pull requests are welcomed! If you have any questions or comments you can contact chatboteventnotify@gmail.com.
 
